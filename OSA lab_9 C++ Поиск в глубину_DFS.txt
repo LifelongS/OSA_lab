@@ -1,0 +1,80 @@
+// С++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Структура данных для хранения одного ребра графа
+struct Edge {
+    int src, dest;
+};
+
+// Класс для предъявления графа
+class Graph
+{
+public:
+    // двумерный вектор (a vector of vectors ) для предъявления списка смежности
+    vector<vector<int>> adjList;
+
+    // Конструктор графа
+    Graph(vector<Edge> const& edges, int n)
+    {
+        // изменим размер вектора так, чтобы в нем содержалось `n` элементов типа `vector<int>`
+        adjList.resize(n);
+
+        // добавление ребер к неориентированному графу
+        for (auto& edge : edges)
+        {
+            adjList[edge.src].push_back(edge.dest);
+            adjList[edge.dest].push_back(edge.src);
+        }
+    }
+};
+
+// Функция для выполнения обхода в глубину (DFS) на графе
+void DFS(Graph const& graph, int v, vector<bool>& discovered)
+{
+    // отметим текущий узел как обнаруженный
+    discovered[v] = true;
+
+    // вывод текущего узла
+    cout << v << " ";
+
+    // выполняем для каждого ребра (v, u)
+    for (int u : graph.adjList[v])
+    {
+        // если `u` еще не обнаружен
+        if (!discovered[u]) {
+            DFS(graph, u, discovered);
+        }
+    }
+}
+
+int main()
+{
+    // вектор ребер графа в соответствии с диаграммой-примером
+    vector<Edge> edges = {
+        // Обратите внимание, что узел 0 не подключен
+        {1, 2}, {1, 7}, {1, 8}, {2, 3}, {2, 6}, {3, 4},
+        {3, 5}, {8, 9}, {8, 12}, {9, 10}, {9, 11}
+    };
+
+    // общее количество узлов графа (помечено от 0 до 12)
+    int n = 13;
+
+   // строим граф из заданных ребер
+    Graph graph(edges, n);
+
+    // проверка, обнаружена вершина или нет
+    vector<bool> discovered(n);
+
+    // Выполняем обход в глубину (DFS) всех непроверенных узлов, чтобы
+    // охватить все связанные компоненты графа
+    for (int i = 0; i < n; i++)
+    {
+        if (discovered[i] == false) {
+            DFS(graph, i, discovered);
+        }
+    }
+
+    return 0;
+}
