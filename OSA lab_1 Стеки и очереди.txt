@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define STACK_MAX_SIZE 5
+#define QUEUE_MAX_SIZE 5
+typedef int T; // Тип данных
+
+// Обьявление структуры стэка. Данные хранятся в массиве, 
+// для вычисления адреса конца стэка запоминается его размер
+typedef struct Stack_tag {
+    T data[STACK_MAX_SIZE];
+    size_t size;
+} Stack_t;
+
+// Обьявление структуры очереди. Данные хранятся в массиве, 
+// для вычисления адресов конца и начала очереди
+// используется номер ячейки с её началом и её размер
+typedef struct Queue_tag {
+    T data[QUEUE_MAX_SIZE];
+    size_t size;
+    size_t beg;
+} Queue_t;
+
+// Функция добавления элемента в стэк
+void S_push(Stack_t *stack, const T value) {
+    if (stack->size >= STACK_MAX_SIZE) {
+  printf("\nERROR: STACK OWERFLOW");
+        exit(-100);
+    }
+    stack->data[stack->size] = value;
+    stack->size++;
+}
+
+// Функция добавления элемента в очередь
+void Q_push(Queue_t *queue, const T value) {
+    if (queue->size >= QUEUE_MAX_SIZE) {
+  printf("\nERROR: QUEUE OWERFLOW");
+        exit(-200);
+    }
+    queue->data[(queue->size+queue->beg) % QUEUE_MAX_SIZE] = value;
+    queue->size++;
+}
+
+// Функция извлечения элемента из стэка
+T S_pop(Stack_t *stack) {
+    if (stack->size == 0) {
+  printf("\nERROR: STACK UNDERRFLOW");
+        exit(-101);
+    }
+    stack->size--;
+    printf("%d\n", stack->data[stack->size]);
+    return stack->data[stack->size];
+}
+
+// Функция извлечения элемента из очереди
+T Q_pop(Queue_t *queue) {
+    if (queue->size == 0) {
+  printf("\nERROR: QUEUE UNDERRFLOW");
+        exit(-201);
+    }
+    queue->beg++;
+    queue->size--;
+    printf("%d\n", queue->data[queue->beg-1]);
+    queue->beg %= QUEUE_MAX_SIZE;
+    return queue->data[queue->size-1];
+}
+
+int main()
+{
+ Stack_t stack;
+    stack.size = 0;
+    
+ Queue_t queue;
+    queue.size = 0;
+    queue.beg = 0;   
+ 
+    S_push(&stack, 1);
+    S_push(&stack, 2);
+    S_push(&stack, 3);
+    S_push(&stack, 4);
+    S_pop(&stack);
+    S_pop(&stack);
+    S_pop(&stack);
+    S_pop(&stack);
+    
+    printf("\n");
+    
+    Q_push(&queue, 7);
+    Q_push(&queue, 8);
+    Q_push(&queue, 9);
+    Q_push(&queue, 0);
+
+ return 0;
+}
