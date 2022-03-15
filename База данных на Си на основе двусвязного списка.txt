@@ -1,0 +1,146 @@
+/*база данных и простое меню с функциями: добавка, удаление, поиск, вывод всех элементов и запись в/из файл(а)*/
+
+#include <stdio.h>
+#include <stdlib.h>
+ 
+typedef struct Node{
+    int number;
+    float age;
+    char group;
+    struct Node *next;
+    struct Node *prev;
+}Node;
+ 
+typedef struct List{
+    int amount;
+    Node *head;
+    Node *tail;
+}List;
+ 
+void pushBack(List *list, int Number, float Age, char Group){
+    Node *tmp = (Node*) malloc(sizeof(Node));
+    if(tmp == NULL){exit(3);}
+ 
+    tmp->number = Number;
+    tmp->age = Age;
+    tmp->group = Group;
+ 
+    tmp->next = NULL;
+    tmp->prev = list->tail;
+    if(list->tail){list->tail->next = tmp;}
+    list->tail = tmp;
+ 
+    if(list->head == NULL){list->head = tmp;}
+    list->amount++;}
+ 
+void printList(Node *root){
+  if(root == NULL){printf("\nList is empty!\n"); return 0;}
+  Node *p;
+  p = root;
+  do{
+    printf("Number: %d\n", p->number);
+    printf("Age: %4.1f\n", p->age);
+    printf("Group: %c\n\n", p->group);
+    p = p->next;
+  }while (p != NULL);}
+ 
+Node* getNth(List *list, size_t index){
+    if(list->head == NULL){printf("\nList is empty!\n"); return 0;}
+    Node *tmp = list->head;
+    size_t i = 0;
+    while (tmp && i < index){
+        tmp = tmp->next;
+        i++;}
+    return tmp;}
+ 
+void* deleteNth(List *list, size_t index){
+    if(list->head == NULL){printf("\nList is empty!\n"); return 0;}
+    Node *elm = NULL;
+    void *tmp = NULL;
+    elm = getNth(list, index);
+    if(elm == NULL){exit(5);}
+    if(elm->prev){elm->prev->next = elm->next;}
+    if(elm->next){elm->next->prev = elm->prev;}
+    tmp = elm->number;
+ 
+    if(!elm->prev){list->head = elm->next;}
+    if(!elm->next){list->tail = elm->prev;}
+ 
+    free(elm);
+    list->amount--;
+    return tmp;}
+ 
+void changeEl(List *list, int number){
+    if(list->head == NULL){printf("\nList is empty!\n"); return 0;}
+    float newAge; int newNumber; char newGroup, choice;
+    Node *tmp = getNth(list, number);
+    printf("What parameter do you want to change(group/age/number): ");
+    scanf("%s", &choice);
+    if(choice == 'g'){
+        printf("\nEnter new group: ");
+        scanf("%s", &newGroup);
+        tmp->group = newGroup;}
+    else if(choice == 'a'){
+        printf("\nEnter new age: ");
+        scanf("%f", &newAge);
+        tmp->age = newAge;}
+    else if(choice == 'n'){
+        printf("\nEnter new number: ");
+        scanf("%d", &newNumber);
+        tmp->number = newNumber;}
+}
+ 
+void menuPrint(){
+    printf("\nChoose an action:\n");
+    printf("\t>a - add new element\n");
+    printf("\t>p - display all list elements\n");
+    printf("\t>d - delete element\n");
+    printf("\t>c - find element and change its value\n");
+    printf("\t>s - save list to text file\n");
+    printf("\t> ");
+}
+ 
+void saveListToFile(Node *root){
+  if(root == NULL){printf("\nList is empty!\n"); return 0;}
+  FILE *f = fopen("C:\\Users\\User\\Desktop\\Zad PProg2\\Zadanie 2text.txt", "r+");
+  if(f == NULL){printf("\nERROR!!! Cannot open the file!\n"); return 0;}
+  Node *p;
+  p = root;
+  do{
+    fprintf(f, "%d %4.1f %c\n", p->number, p->age, p->group);
+    p = p->next;
+  }while (p != NULL);
+  fclose(f);}
+ 
+ 
+ 
+int main(){
+    List *list = (List*)malloc(sizeof(List));
+    list->head = NULL;  list->tail = NULL; list->amount = 0;
+    float age = 0; int number = 0;
+    char choice, group; void *toChange;
+    for(;;){
+    menuPrint();
+    scanf("%s", &choice);
+    if(choice == 'a'){
+        printf("Enter number, age and group: ");
+        scanf("%d %f %c", &number, &age, &group);
+        pushBack(list, number, age, group);}
+    else if(choice == 'p'){
+        printf("\n");
+        printList(list->head);
+    }
+    else if(choice == 's'){
+        saveListToFile(list->head);
+    }
+    else if(choice == 'd'){
+        printf("Enter value of el: ");
+        scanf("%d", &number);
+        deleteNth(list, number);
+    }
+    else if(choice == 'c'){
+        printf("Enter number of el: ");
+        scanf("%d", &number);
+        changeEl(list, number);
+        }}
+return 0;}
